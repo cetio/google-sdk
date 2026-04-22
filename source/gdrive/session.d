@@ -1,8 +1,8 @@
 module source.gdrive.session;
 
-import composer.http : Response;
-import composer.oauth : OAuth, OAuthError, TokenBundle;
-import composer.orchestrate : Orchestrator;
+import conductor.http : Response;
+import conductor.oauth : OAuth, OAuthError, TokenBundle;
+import conductor.orchestrate : Orchestrator;
 import core.thread : Thread;
 import core.time : dur;
 import gdrive.errors;

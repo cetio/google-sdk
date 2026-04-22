@@ -1,6 +1,6 @@
 module gdrive.test.dummy.testserver;
 
-import composer.query : parseQuery;
+import conductor.query : parseQuery;
 import core.thread : Thread;
 import std.conv : to;
 import std.exception : enforce;

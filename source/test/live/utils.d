@@ -3,7 +3,7 @@ module gdrive.test.live.utils;
 version (GDriveTestLive)
 {
     import gdrive : Folder, Identity, Session;
-    import composer.oauth : OAuth;
+    import conductor.oauth : OAuth;
     import std.exception : enforce;
     import std.file : readText;
     import std.json : parseJSON;

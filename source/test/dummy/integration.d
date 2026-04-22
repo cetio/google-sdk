@@ -7,9 +7,9 @@ version (GDriveTestDummy)
     import gdrive : File, Folder, folderMimeType, GDriveNotFoundError,
         Identity,
         GDrivePermissionError, GDriveUnsupportedContentError, Session;
-    import composer.http : send;
-    import composer.oauth : OAuth, TokenCache;
-    import composer.query : buildURL, parseQuery;
+    import conductor.http : send;
+    import conductor.oauth : OAuth, TokenCache;
+    import conductor.query : buildURL, parseQuery;
     import gdrive.test.dummy.testserver : SimpleHttpServer, TestRequest, TestResponse;
     import std.conv : to;
     import std.exception : assertThrown;
@@ -439,7 +439,7 @@ version (GDriveTestDummy)
         scope (exit) server.close();
         string cacheDirectory = buildPath(
             tempDir(),
-            "composer-oauth-dummy-cache-"~thisProcessID.to!string~"-primary",
+            "conductor-oauth-dummy-cache-"~thisProcessID.to!string~"-primary",
         );
         scope (exit)
         {
@@ -534,7 +534,7 @@ version (GDriveTestDummy)
 
         string cacheDirectory = buildPath(
             tempDir(),
-            "composer-oauth-dummy-cache-"~thisProcessID.to!string~"-scope",
+            "conductor-oauth-dummy-cache-"~thisProcessID.to!string~"-scope",
         );
         scope (exit)
         {

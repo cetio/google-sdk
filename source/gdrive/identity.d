@@ -1,6 +1,6 @@
 module gdrive.identity;
 
-import composer.oauth : OAuthError, TokenBundle;
+import conductor.oauth : OAuthError, TokenBundle;
 import gdrive.errors : GDriveAuthError, GDriveProtocolError;
 import gdrive.file : File;
 import gdrive.folder : Folder, folderMimeType;
