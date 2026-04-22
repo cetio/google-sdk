@@ -1,4 +1,4 @@
-module source.gdrive.session;
+module gdrive.session;
 
 import conductor.http : Response;
 import conductor.oauth : OAuth, OAuthError, TokenBundle;
