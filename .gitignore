@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/gdrive
+gdrive.so
+gdrive.dylib
+gdrive.dll
+gdrive.a
+gdrive.lib
+gdrive-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst
