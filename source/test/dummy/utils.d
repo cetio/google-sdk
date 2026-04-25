@@ -1,4 +1,4 @@
-module gdrive.test.dummy.testserver;
+module google.drive.test.dummy.testserver;
 
 import conductor.query : parseQuery;
 import core.thread : Thread;
@@ -36,6 +36,8 @@ class SimpleHttpServer
 private:
     Socket listener;
     TestHandler handler;
+    Thread worker;
+    bool running;
 
 public:
     ushort port()
@@ -51,15 +53,34 @@ public:
         listener.setOption(SocketOptionLevel.SOCKET, SocketOption.REUSEADDR, true);
         listener.bind(new InternetAddress("127.0.0.1", InternetAddress.PORT_ANY));
         listener.listen(8);
+        running = true;
         spawn();
     }
 
     void close()
     {
+        running = false;
+
         if (listener !is null)
         {
+            try
+            {
+                auto wake = new Socket(AddressFamily.INET, SocketType.STREAM);
+                scope (exit) wake.close();
+                wake.connect(new InternetAddress("127.0.0.1", port));
+            }
+            catch (Throwable)
+            {
+            }
+
             listener.close();
             listener = null;
+        }
+
+        if (worker !is null)
+        {
+            worker.join();
+            worker = null;
         }
     }
 
@@ -69,8 +90,8 @@ private:
         Socket localListener = listener;
         TestHandler localHandler = handler;
 
-        Thread thread = new Thread({
-            while (true)
+        worker = new Thread({
+            while (running)
             {
                 Socket client;
                 try
@@ -79,6 +100,9 @@ private:
                 {
                     break;
                 }
+
+                if (!running)
+                    break;
 
                 scope (exit)
                 {
@@ -91,8 +115,7 @@ private:
                 writeResponse(client, response);
             }
         });
-        thread.isDaemon(true);
-        thread.start();
+        worker.start();
     }
 
     TestRequest readRequest(Socket client)

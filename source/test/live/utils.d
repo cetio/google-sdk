@@ -1,8 +1,8 @@
-module gdrive.test.live.utils;
+module google.drive.test.live.utils;
 
-version (GDriveTestLive)
+version (GoogleSdkTestLive)
 {
-    import gdrive : Folder, Identity, Session;
+    import google.drive : Folder, Identity, Session;
     import conductor.oauth : OAuth;
     import std.exception : enforce;
     import std.file : readText;
@@ -11,7 +11,7 @@ version (GDriveTestLive)
 
     public:
 
-    enum liveTestFolderName = "gdrive_test_explicit";
+    enum liveTestFolderName = "google_sdk_test_explicit";
     enum liveExpectedEmail = extractExpectedEmail(import("account.json"));
 
     static assert(liveExpectedEmail !is null,
@@ -22,7 +22,7 @@ version (GDriveTestLive)
         auto clientJson = parseJSON(readText(liveCredentialsPath()));
 
         return new Session(
-            "GDriveD",
+            "GoogleSDKD",
             OAuth.fromJSON(clientJson),
         );
     }

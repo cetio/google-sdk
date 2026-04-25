@@ -1,14 +1,14 @@
-module gdrive.session;
+module google.drive.session;
 
 import conductor.http : Response;
 import conductor.oauth : OAuth, OAuthError, TokenBundle;
 import conductor.orchestrate : Orchestrator;
 import core.thread : Thread;
 import core.time : dur;
-import gdrive.errors;
-import gdrive.file : defaultFileMimeType, File;
-import gdrive.folder : folderMimeType;
-import gdrive.identity : Identity;
+import google.drive.errors;
+import google.drive.file : defaultFileMimeType, File;
+import google.drive.folder : folderMimeType;
+import google.drive.identity : Identity;
 import std.conv : to;
 import std.json : JSONType, JSONValue, parseJSON;
 import std.net.curl : HTTP;
@@ -37,7 +37,7 @@ public:
         string uploadUrl = "https://www.googleapis.com/upload",
     )
     {
-        this.name = name == null ? "GDrive" : name;
+        this.name = name == null ? "GoogleSDK" : name;
         this.oauth = oauth;
         this.api = Orchestrator(apiUrl);
         this.upload = Orchestrator(uploadUrl);
@@ -54,7 +54,7 @@ public:
                 oauth.authorize(this.name, requestedScope)
             );
         catch (OAuthError err)
-            throw new GDriveAuthError(err.msg);
+            throw new GoogleDriveAuthError(err.msg);
 
         ret.refresh();
         return ret;
@@ -68,7 +68,7 @@ public:
         try
             oauth.revoke(identity.tokens);
         catch (OAuthError err)
-            throw new GDriveAuthError(err.msg);
+            throw new GoogleDriveAuthError(err.msg);
 
         identity.tokens = TokenBundle.init;
     }
@@ -148,7 +148,7 @@ public:
 
     JSONValue updateFileData(Identity identity, File file, const(ubyte)[] data)
     {
-        string boundary = "gdrive-"~unpredictableSeed!ulong.to!string;
+        string boundary = "google-sdk-"~unpredictableSeed!ulong.to!string;
         string mimeType = file.mimeType == null ? defaultFileMimeType : file.mimeType;
 
         string prefix =
@@ -176,6 +176,20 @@ public:
             content,
             "multipart/related; boundary="~boundary,
             true,
+        );
+    }
+
+    Response exportFile(Identity identity, string id, string mimeType)
+    {
+        return execute(
+            identity,
+            false,
+            HTTP.Method.get,
+            filePath(id)~"/export",
+            [
+                "mimeType": mimeType,
+                "supportsAllDrives": "false",
+            ],
         );
     }
 
@@ -273,7 +287,7 @@ public:
             throw err;
         }
 
-        throw new GDriveProtocolError("Google Drive request failed before completion.");
+        throw new GoogleDriveProtocolError("Google Drive request failed before completion.");
     }
 
     string filePath(string id) const
@@ -293,27 +307,27 @@ private:
             message = "HTTP request failed with status "~response.status.to!string;
 
         if (response.status == 401)
-            return new GDriveAuthError(message);
+            return new GoogleDriveAuthError(message);
 
         if (response.status == 403)
-            return new GDrivePermissionError(message);
+            return new GoogleDrivePermissionError(message);
 
         if (response.status == 404)
-            return new GDriveNotFoundError(message);
+            return new GoogleDriveNotFoundError(message);
 
         if (response.status == 429)
-            return new GDriveRateLimitError(message);
+            return new GoogleDriveRateLimitError(message);
 
-        return new GDriveProtocolError(message);
+        return new GoogleDriveProtocolError(message);
     }
 
     void ensureAuthorized(Identity identity)
     {
         if (identity is null || identity.tokens.empty())
-            throw new GDriveAuthError("No Google Drive session is available. Call `login()` first.");
+            throw new GoogleDriveAuthError("No Google Drive session is available. Call `login()` first.");
 
         if (identity.tokens.expired() && !identity.tryRefresh())
-            throw new GDriveAuthError("The Google Drive session has expired and could not be refreshed.");
+            throw new GoogleDriveAuthError("The Google Drive session has expired and could not be refreshed.");
     }
 
     string buildListQuery(string parentId, bool foldersOnly) const

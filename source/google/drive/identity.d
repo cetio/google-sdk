@@ -1,10 +1,10 @@
-module gdrive.identity;
+module google.drive.identity;
 
 import conductor.oauth : OAuthError, TokenBundle;
-import gdrive.errors : GDriveAuthError, GDriveProtocolError;
-import gdrive.file : File;
-import gdrive.folder : Folder, folderMimeType;
-import gdrive.session : Session;
+import google.drive.errors : GoogleDriveAuthError, GoogleDriveProtocolError;
+import google.drive.file : File;
+import google.drive.folder : Folder, folderMimeType;
+import google.drive.session : Session;
 import std.json : JSONType, JSONValue;
 import std.net.curl : HTTP;
 
@@ -66,7 +66,7 @@ public:
             value["mimeType"].type != JSONType.string ||
             value["mimeType"].str != folderMimeType
         )
-            throw new GDriveProtocolError("The requested Google Drive item is not a folder.");
+            throw new GoogleDriveProtocolError("The requested Google Drive item is not a folder.");
 
         return Folder.fromJson(this, value);
     }
@@ -80,7 +80,7 @@ public:
             value["mimeType"].type != JSONType.string ||
             value["mimeType"].str == folderMimeType
         )
-            throw new GDriveProtocolError("The requested Google Drive item is a folder, not a file.");
+            throw new GoogleDriveProtocolError("The requested Google Drive item is a folder, not a file.");
 
         return File.fromJson(this, value);
     }
@@ -89,10 +89,10 @@ public:
         if (is(T == Folder) || is(T == File))
     {
         if (item is null)
-            throw new GDriveProtocolError("Cannot create a null Google Drive object.");
+            throw new GoogleDriveProtocolError("Cannot create a null Google Drive object.");
 
         if (item.identity !is this)
-            throw new GDriveProtocolError("Cannot create a Google Drive object that belongs to a different identity.");
+            throw new GoogleDriveProtocolError("Cannot create a Google Drive object that belongs to a different identity.");
 
         item.create();
         return item;
@@ -144,7 +144,7 @@ public:
             ["fields": "user(displayName,emailAddress,permissionId)"],
         );
         if (!("user" in json) || json["user"].type != JSONType.object)
-            throw new GDriveProtocolError("Google Drive did not return the current account.");
+            throw new GoogleDriveProtocolError("Google Drive did not return the current account.");
 
         JSONValue user = json["user"];
 
@@ -152,7 +152,7 @@ public:
         email = "emailAddress" in user ? user["emailAddress"].str : null;
         displayName = "displayName" in user ? user["displayName"].str : null;
         if (permissionId == null)
-            throw new GDriveProtocolError("Google Drive did not return the current account permission ID.");
+            throw new GoogleDriveProtocolError("Google Drive did not return the current account permission ID.");
     }
 
     void logout()
@@ -168,7 +168,7 @@ public:
         try
             tokens = session.oauth.refresh(tokens);
         catch (OAuthError err)
-            throw new GDriveAuthError(err.msg);
+            throw new GoogleDriveAuthError(err.msg);
 
         return true;
     }

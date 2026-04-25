@@ -1,16 +1,16 @@
-module gdrive.test.dummy.integration;
+module google.drive.test.dummy.integration;
 
-version (GDriveTestDummy)
+version (GoogleSdkTestDummy)
 {
     import core.thread : Thread;
     import core.time : dur;
-    import gdrive : File, Folder, folderMimeType, GDriveNotFoundError,
+    import google.drive : File, Folder, folderMimeType, GoogleDriveNotFoundError,
         Identity,
-        GDrivePermissionError, GDriveUnsupportedContentError, Session;
+        GoogleDrivePermissionError, GoogleDriveUnsupportedContentError, Session;
     import conductor.http : send;
     import conductor.oauth : OAuth, TokenCache;
     import conductor.query : buildURL, parseQuery;
-    import gdrive.test.dummy.testserver : SimpleHttpServer, TestRequest, TestResponse;
+    import google.drive.test.dummy.testserver : SimpleHttpServer, TestRequest, TestResponse;
     import std.conv : to;
     import std.exception : assertThrown;
     import std.file : exists, read, remove, rmdirRecurse, tempDir;
@@ -18,7 +18,7 @@ version (GDriveTestDummy)
     import std.net.curl : HTTP;
     import std.path : buildPath;
     import std.process : thisProcessID;
-    import std.string : indexOf, lastIndexOf, startsWith;
+    import std.string : endsWith, indexOf, lastIndexOf, startsWith;
 
     public:
 
@@ -113,7 +113,15 @@ version (GDriveTestDummy)
             stale.failUploadOnce = true;
             addEntry(stale);
 
-            addEntry(FakeEntry("doc-1", "Doc", "application/vnd.google-apps.document", "folder-1"));
+            FakeEntry doc = FakeEntry("doc-1", "Doc", "application/vnd.google-apps.document", "folder-1");
+            doc.data = cast(ubyte[])"Document export".dup;
+            addEntry(doc);
+
+            FakeEntry sheet = FakeEntry("sheet-1", "Sheet", "application/vnd.google-apps.spreadsheet", "folder-1");
+            sheet.data = cast(ubyte[])"a,b\n1,2\n".dup;
+            addEntry(sheet);
+
+            addEntry(FakeEntry("slide-1", "Slide", "application/vnd.google-apps.presentation", "folder-1"));
         }
 
         void addEntry(FakeEntry entry)
@@ -281,6 +289,9 @@ version (GDriveTestDummy)
         TestResponse handleItem(TestRequest request)
         {
             string id = request.path["/drive/v3/files/".length..$];
+            bool exportRequest = id.endsWith("/export");
+            if (exportRequest)
+                id = id[0..$-"/export".length];
 
             if (id == "forbidden")
                 return errorResponse(403, "Forbidden", "insufficientFilePermissions");
@@ -302,6 +313,14 @@ version (GDriveTestDummy)
                 return errorResponse(404, "Not Found", "notFound");
 
             string[string] queryValues = parseQuery(request.queryString);
+            if (exportRequest)
+            {
+                TestResponse response;
+                response.headers["content-type"] = queryValues.get("mimeType", null);
+                response.content = entry.data.dup;
+                return response;
+            }
+
             if (queryValues.get("alt", null) == "media")
             {
                 string auth = headerValue(request, "authorization");
@@ -448,7 +467,7 @@ version (GDriveTestDummy)
         }
 
         Session session = new Session(
-            "GDrive Dummy Tests",
+            "GoogleDrive Dummy Tests",
             makeDummyOAuth(server.baseUrl(), &stats, new TokenCache(cacheDirectory)),
             server.baseUrl(),
             server.baseUrl()~"/upload",
@@ -468,7 +487,7 @@ version (GDriveTestDummy)
         assert(roots[0].name == "Coursework");
 
         File[] rootFiles = roots[0].files();
-        assert(rootFiles.length == 3);
+        assert(rootFiles.length == 5);
         assert(identity.file("file-1").read() == cast(ubyte[])"initial-data");
         assert(stats.refreshCalls == 1);
 
@@ -501,7 +520,7 @@ version (GDriveTestDummy)
         identity.remove(doomed);
         assert(doomed.read() is null);
 
-        string savePath = buildPath(tempDir(), "gdrive-dummy-save-"~thisProcessID.to!string);
+        string savePath = buildPath(tempDir(), "google-sdk-dummy-save-"~thisProcessID.to!string);
         scope (exit)
         {
             if (exists(savePath))
@@ -511,9 +530,11 @@ version (GDriveTestDummy)
         assert(read(savePath) == cast(ubyte[])"created-data");
 
         File workspace = identity.file("doc-1");
-        assertThrown!GDriveUnsupportedContentError(workspace.read());
-        assertThrown!GDriveNotFoundError(identity.file("missing"));
-        assertThrown!GDrivePermissionError(identity.file("forbidden"));
+        assert(workspace.text == "Document export");
+        assert(identity.file("sheet-1").text == "a,b\n1,2\n");
+        assertThrown!GoogleDriveUnsupportedContentError(identity.file("slide-1").read());
+        assertThrown!GoogleDriveNotFoundError(identity.file("missing"));
+        assertThrown!GoogleDrivePermissionError(identity.file("forbidden"));
 
         identity.logout();
 
@@ -543,7 +564,7 @@ version (GDriveTestDummy)
         }
 
         Session session = new Session(
-            "GDrive Dummy Cache Scope Tests",
+            "Google SDK Dummy Cache Scope Tests",
             makeDummyOAuth(server.baseUrl(), &stats, new TokenCache(cacheDirectory)),
             server.baseUrl(),
             server.baseUrl()~"/upload",

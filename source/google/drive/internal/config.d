@@ -1,4 +1,4 @@
-module gdrive.internal.config;
+module google.drive.internal.config;
 
 import std.path : buildPath, expandTilde;
 import std.process : environment;
@@ -9,7 +9,7 @@ public:
 struct AccountConfig
 {
     string clientCredentialsPath = "~/.config/galah/google-oauth-client.json";
-    string tokenStoreDir = "~/.local/state/galah/gdrive/accounts";
+    string tokenStoreDir = "~/.local/state/galah/google-sdk/accounts";
     string applicationName = "Galah";
     bool supportsAllDrives = false;
 }

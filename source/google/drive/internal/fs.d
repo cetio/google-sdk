@@ -1,4 +1,4 @@
-module gdrive.internal.fs;
+module google.drive.internal.fs;
 
 import std.datetime : Clock, SysTime;
 import std.conv : to;

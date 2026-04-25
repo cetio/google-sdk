@@ -2,11 +2,46 @@
 	"authors": [
 		"cet"
 	],
+	"configurations": [
+		{
+			"name": "dummy-tests",
+			"targetType": "library",
+			"versions": [
+				"GoogleSdkTestDummy"
+			]
+		},
+		{
+			"name": "live-tests",
+			"stringImportPaths": [
+				"."
+			],
+			"targetType": "library",
+			"versions": [
+				"GoogleSdkTestLive"
+			]
+		},
+		{
+			"name": "full-tests",
+			"stringImportPaths": [
+				"."
+			],
+			"targetType": "library",
+			"versions": [
+				"GoogleSdkTestDummy",
+				"GoogleSdkTestLive"
+			]
+		}
+	],
 	"copyright": "Copyright © 2026, cet",
 	"dependencies": {
-		"conductor": "~>1.0.0"
+		"conductor": {
+			"path": "../conductor"
+		}
 	},
-	"description": "Google Drive API with support for OAuth, accounts, and full file system with metadata.",
+	"description": "google-sdk provides pragmatic D bindings for Google Drive plus lightweight Docs and Sheets text export helpers.",
 	"license": "AGPL-3.0-only",
-	"name": "gdrive"
+	"name": "google-sdk",
+	"sourcePaths": [
+		"source"
+	]
 }

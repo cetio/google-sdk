@@ -1,9 +1,9 @@
-module gdrive.test.live.integration;
+module google.drive.test.live.integration;
 
-version (GDriveTestLive)
+version (GoogleSdkTestLive)
 {
-    import gdrive : File, Folder, Identity, Session;
-    import gdrive.test.live.utils : assertExpectedIdentity, liveTestFolderName,
+    import google.drive : File, Folder, Identity, Session;
+    import google.drive.test.live.utils : assertExpectedIdentity, liveTestFolderName,
         makeLiveSession, recreateTestRoot;
 
     private bool hasFolderNamed(Folder[] folders, string name)
