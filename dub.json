@@ -36,7 +36,7 @@
 	"dependencies": {
 		"conductor": "~>2.0.0"
 	},
-	"description": "google-sdk provides pragmatic D bindings for Google Drive plus lightweight Docs and Sheets text export helpers.",
+	"description": "Google SDK supporting Drive, Docs, Sheets with export helpers.",
 	"license": "AGPL-3.0-only",
 	"name": "google-sdk",
 	"sourcePaths": [
