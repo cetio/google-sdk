@@ -41,93 +41,73 @@ public:
             this.parentId = parentId;
     }
 
-    @property string id() const
+    string id() const
         => _id;
 
-    @property void id(string value)
-    {
-        _id = value;
-    }
+    string id(string value)
+        => _id = value;
 
-    @property string name() const
+    string name() const
         => _name;
 
-    @property void name(string value)
-    {
-        _name = value;
-    }
+    string name(string value)
+        => _name = value;
 
-    @property string mimeType() const
+    string mimeType() const
         => _mimeType;
 
-    @property void mimeType(string value)
-    {
-        _mimeType = value == null ? defaultFileMimeType : value;
-    }
+    string mimeType(string value)
+        => _mimeType = value == null ? defaultFileMimeType : value;
 
-    @property string parentId() const
+    string parentId() const
         => _parentId;
 
-    @property void parentId(string value)
-    {
-        _parentId = value == null ? "root" : value;
-    }
+    string parentId(string value)
+        => _parentId = value == null ? "root" : value;
 
-    @property ulong sizeBytes() const
+    ulong sizeBytes() const
         => _sizeBytes;
 
-    @property void sizeBytes(ulong value)
-    {
-        _sizeBytes = value;
-    }
+    ulong sizeBytes(ulong value)
+        => _sizeBytes = value;
 
-    @property string modifiedTime() const
+    string modifiedTime() const
         => _modifiedTime;
 
-    @property void modifiedTime(string value)
-    {
-        _modifiedTime = value;
-    }
+    string modifiedTime(string value)
+        => _modifiedTime = value;
 
-    @property bool trashed() const
+    bool trashed() const
         => _trashed;
 
-    @property void trashed(bool value)
-    {
-        _trashed = value;
-    }
+    bool trashed(bool value)
+        => _trashed = value;
 
-    @property string driveId() const
+    string driveId() const
         => _driveId;
 
-    @property void driveId(string value)
-    {
-        _driveId = value;
-    }
+    string driveId(string value)
+        => _driveId = value;
 
-    @property string webViewLink() const
+    string webViewLink() const
         => _webViewLink;
 
-    @property void webViewLink(string value)
-    {
-        _webViewLink = value;
-    }
+    string webViewLink(string value)
+        => _webViewLink = value;
 
-    @property string md5Checksum() const
+    string md5Checksum() const
         => _md5Checksum;
 
-    @property void md5Checksum(string value)
-    {
-        _md5Checksum = value;
-    }
+    string md5Checksum(string value)
+        => _md5Checksum = value;
 
     bool draft() const
         => id == null;
 
-    @property bool workspaceNative() const
+    bool workspaceNative() const
         => mimeType.startsWith(workspaceMimeTypePrefix) && mimeType != folderMimeType;
 
-    @property bool textReadable() const
+    bool textReadable() const
     {
         if (isGoogleDoc(mimeType) || isGoogleSheet(mimeType))
             return true;
@@ -301,7 +281,7 @@ public:
         atomicWriteBytes(resolvedPath, bytes);
     }
 
-    @property string text()
+    string text()
     {
         if (draft())
             return null;
