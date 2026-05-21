@@ -36,7 +36,7 @@
 	"dependencies": {
 		"conductor": "~>2.0.0"
 	},
-	"description": "Google SDK supporting Drive, Docs, Sheets with export helpers.",
+	"description": "Google Drive API with support for OAuth, accounts, and full file system with metadata.",
 	"license": "AGPL-3.0-only",
 	"name": "google-sdk",
 	"sourcePaths": [
