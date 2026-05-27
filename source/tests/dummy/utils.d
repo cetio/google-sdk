@@ -1,4 +1,4 @@
-module google.drive.test.dummy.testserver;
+module tests.dummy.testserver;
 
 import conductor.query : parseQuery;
 import core.thread : Thread;

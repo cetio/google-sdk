@@ -1,4 +1,4 @@
-module google.drive.test.live.utils;
+module tests.live.utils;
 
 version (GoogleSdkTestLive)
 {

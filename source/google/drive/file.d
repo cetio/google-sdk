@@ -293,7 +293,7 @@ public:
             return googleDocText(identity, id);
 
         if (googleSheet())
-            return googleSheetText(identity, id);
+            return googleSheetCsv(identity, id);
 
         if (!supportsTextMimeType(mimeType))
             throw new GoogleDriveUnsupportedContentError(
