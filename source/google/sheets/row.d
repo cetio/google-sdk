@@ -14,7 +14,7 @@ public:
         this.cells = cells;
     }
 
-    CellValue opIndex(size_t col) const
+    CellValue opIndex(size_t col)
     {
         if (col >= cells.length)
             throw new Exception("Column index out of bounds.");
@@ -22,7 +22,7 @@ public:
         return cells[col];
     }
 
-    Row opSlice(size_t start, size_t end) const
+    Row opSlice(size_t start, size_t end)
     {
         if (start > end || end > cells.length)
             throw new Exception("Invalid slice range.");

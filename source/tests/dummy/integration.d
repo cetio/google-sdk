@@ -1,4 +1,4 @@
-module google.drive.test.dummy.integration;
+module tests.dummy.integration;
 
 version (GoogleSdkTestDummy)
 {
@@ -7,10 +7,11 @@ version (GoogleSdkTestDummy)
     import google.drive : File, Folder, folderMimeType, GoogleDriveNotFoundError,
         Identity,
         GoogleDrivePermissionError, GoogleDriveUnsupportedContentError, Session;
+    import google.sheets : CellType, CellValue, Table, TableType;
     import conductor.http : send;
     import conductor.oauth : OAuth, TokenCache;
     import conductor.query : buildURL, parseQuery;
-    import google.drive.test.dummy.testserver : SimpleHttpServer, TestRequest, TestResponse;
+    import tests.dummy.testserver : SimpleHttpServer, TestRequest, TestResponse;
     import std.conv : to;
     import std.exception : assertThrown;
     import std.file : exists, read, remove, rmdirRecurse, tempDir;
@@ -120,6 +121,16 @@ version (GoogleSdkTestDummy)
             FakeEntry sheet = FakeEntry("sheet-1", "Sheet", "application/vnd.google-apps.spreadsheet", "folder-1");
             sheet.data = cast(ubyte[])"a,b\n1,2\n".dup;
             addEntry(sheet);
+
+            FakeEntry typedSheet = FakeEntry(
+                "sheet-2",
+                "TypedSheet",
+                "application/vnd.google-apps.spreadsheet",
+                "folder-1",
+            );
+            typedSheet.data = cast(ubyte[])
+                "name,age,score,active\nAlice,30,95.5,true\nBob,25,87.0,false\n,40,,true\n".dup;
+            addEntry(typedSheet);
 
             addEntry(FakeEntry("slide-1", "Slide", "application/vnd.google-apps.presentation", "folder-1"));
         }
@@ -532,6 +543,47 @@ version (GoogleSdkTestDummy)
         File workspace = identity.file("doc-1");
         assert(workspace.text == "Document export");
         assert(identity.file("sheet-1").text == "a,b\n1,2\n");
+
+        Table table = identity.table("sheet-2");
+        assert(table.type == TableType.Snapshot);
+        assert(table.data.length == 4);
+
+        assert(table[0, 0].type == CellType.String);
+        assert(table[0, 0].str == "name");
+        assert(table[1, 0].str == "Alice");
+        assert(table[1, 1].type == CellType.Integer);
+        assert(table[1, 1].integer == 30);
+        assert(table[1, 2].type == CellType.Floating);
+        assert(table[1, 2].floating == 95.5);
+        assert(table[1, 3].type == CellType.Boolean);
+        assert(table[1, 3].boolean == true);
+        assert(table[2, 3].boolean == false);
+        assert(table[3, 0].type == CellType.Empty);
+        assert(table[3, 1].integer == 40);
+        assert(table[3, 2].type == CellType.Empty);
+        assert(table[3, 3].boolean == true);
+
+        Row row0 = table[0];
+        assert(row0.cells.length == 4);
+        assert(row0[0].str == "name");
+        assert(row0[1..$].cells.length == 3);
+
+        Table sub = table[0..2, 0..2];
+        assert(sub.data.length == 2);
+        assert(sub[0, 0].str == "name");
+        assert(sub[1, 0].str == "Alice");
+        assert(sub[1, 1].integer == 30);
+
+        Row rowSlice = table[1, 1..3];
+        assert(rowSlice.cells.length == 2);
+        assert(rowSlice[0].integer == 30);
+        assert(rowSlice[1].floating == 95.5);
+
+        CellValue[] colSlice = table[1..3, 0];
+        assert(colSlice.length == 2);
+        assert(colSlice[0].str == "Alice");
+        assert(colSlice[1].str == "Bob");
+
         assertThrown!GoogleDriveUnsupportedContentError(identity.file("slide-1").read());
         assertThrown!GoogleDriveNotFoundError(identity.file("missing"));
         assertThrown!GoogleDrivePermissionError(identity.file("forbidden"));

@@ -52,7 +52,7 @@ public:
             static assert(false, "Table only supports 2 dimensions.");
     }
 
-    Row opIndex(size_t row) const
+    Row opIndex(size_t row)
     {
         if (row >= data.length)
             throw new Exception("Row index out of bounds.");
@@ -60,7 +60,7 @@ public:
         return Row(data[row]);
     }
 
-    CellValue opIndex(size_t row, size_t col) const
+    CellValue opIndex(size_t row, size_t col)
     {
         if (row >= data.length)
             throw new Exception("Row index out of bounds.");
@@ -71,12 +71,12 @@ public:
         return data[row][col];
     }
 
-    Range opSlice(size_t dim)(size_t start, size_t end) const
+    Range opSlice(size_t dim)(size_t start, size_t end)
     {
         return Range(start, end);
     }
 
-    Table opIndex(Range rows) const
+    Table opIndex(Range rows)
     {
         Table ret;
         ret.type = type;
@@ -93,7 +93,7 @@ public:
         return ret;
     }
 
-    Table opIndex(Range rows, Range cols) const
+    Table opIndex(Range rows, Range cols)
     {
         Table ret;
         ret.type = type;
@@ -118,7 +118,7 @@ public:
         return ret;
     }
 
-    Row opIndex(size_t row, Range cols) const
+    Row opIndex(size_t row, Range cols)
     {
         if (row >= data.length)
             throw new Exception("Row index out of bounds.");
@@ -134,7 +134,7 @@ public:
         return Row(rowSlice);
     }
 
-    CellValue[] opIndex(Range rows, size_t col) const
+    CellValue[] opIndex(Range rows, size_t col)
     {
         CellValue[] ret;
         foreach (size_t rowIndex; rows.start..rows.end)
