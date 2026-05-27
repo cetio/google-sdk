@@ -1,6 +1,7 @@
 module google.docs;
 
 import std.string : assumeUTF;
+import google.drive.id : Identity;
 
 public:
 
@@ -10,7 +11,7 @@ enum exportMimeType = "text/plain";
 bool supports(string value)
     => value == mimeType;
 
-string text(I)(I identity, string id)
+string text(Identity identity, string id)
 {
     ubyte[] bytes = identity.session.exportFile(identity, id, exportMimeType).content;
     return bytes is null ? null : bytes.assumeUTF().idup;

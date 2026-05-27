@@ -5,6 +5,7 @@ import google.drive.errors : GoogleDriveAuthError, GoogleDriveProtocolError;
 import google.drive.file : File;
 import google.drive.folder : Folder, folderMimeType;
 import google.drive.session : Session;
+import google.sheets : Sheet, SheetType, googleSheetText = text;
 import std.json : JSONType, JSONValue;
 import std.net.curl : HTTP;
 
@@ -85,6 +86,16 @@ public:
         return File.fromJson(this, value);
     }
 
+    Sheet sheet(string id)
+    {
+        File file = this.file(id);
+        if (!file.googleSheet())
+            throw new GoogleDriveProtocolError("The requested Google Drive item is not a spreadsheet.");
+
+        string csv = googleSheetText(this, id);
+        return Sheet.fromText(csv, file, SheetType.Snapshot);
+    }
+
     T create(T)(T item)
         if (is(T == Folder) || is(T == File))
     {
@@ -92,7 +103,9 @@ public:
             throw new GoogleDriveProtocolError("Cannot create a null Google Drive object.");
 
         if (item.identity !is this)
-            throw new GoogleDriveProtocolError("Cannot create a Google Drive object that belongs to a different identity.");
+            throw new GoogleDriveProtocolError(
+                "Cannot create a Google Drive object that belongs to a different identity.",
+            );
 
         item.create();
         return item;
