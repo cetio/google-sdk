@@ -86,14 +86,14 @@ public:
         return File.fromJson(this, value);
     }
 
-    Sheet sheet(string id)
+    Table table(string id)
     {
         File file = this.file(id);
         if (!file.googleSheet())
             throw new GoogleDriveProtocolError("The requested Google Drive item is not a spreadsheet.");
 
-        string csv = googleSheetText(this, id);
-        return Sheet.fromText(csv, file, SheetType.Snapshot);
+        string csv = googleSheetCsv(this, id);
+        return Table.fromText(csv, file, TableType.Snapshot);
     }
 
     T create(T)(T item)

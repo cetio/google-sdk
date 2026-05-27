@@ -6,7 +6,7 @@ import google.drive.folder : folderMimeType;
 import google.drive.identity : Identity;
 import google.drive.ifile : IFile;
 import google.drive.internal.fs : atomicWriteBytes, ensureDirectory;
-import google.sheets : googleSheetExportMimeType = exportMimeType, googleSheetText = text, isGoogleSheet = supports;
+import google.sheets : googleSheetExportMimeType = exportMimeType, googleSheetCsv = csv, isGoogleSheet = supports;
 import std.algorithm.searching : canFind;
 import std.conv : to;
 import std.json : JSONType, JSONValue;
