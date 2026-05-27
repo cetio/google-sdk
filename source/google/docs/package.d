@@ -1,7 +1,7 @@
 module google.docs;
 
 import std.string : assumeUTF;
-import google.drive.id : Identity;
+import google.drive.identity : Identity;
 
 public:
 

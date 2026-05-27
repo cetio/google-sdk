@@ -1,6 +1,6 @@
 module google.sheets;
 
-import google.drive.id : Identity;
+import google.drive.identity : Identity;
 import std.string : assumeUTF;
 
 public:
