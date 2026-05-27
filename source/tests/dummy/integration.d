@@ -7,7 +7,7 @@ version (GoogleSdkTestDummy)
     import google.drive : File, Folder, folderMimeType, GoogleDriveNotFoundError,
         Identity,
         GoogleDrivePermissionError, GoogleDriveUnsupportedContentError, Session;
-    import google.sheets : CellType, CellValue, Table, TableType;
+    import google.sheets : CellType, CellValue, Table, TableType, Row;
     import conductor.http : send;
     import conductor.oauth : OAuth, TokenCache;
     import conductor.query : buildURL, parseQuery;
@@ -498,7 +498,7 @@ version (GoogleSdkTestDummy)
         assert(roots[0].name == "Coursework");
 
         File[] rootFiles = roots[0].files();
-        assert(rootFiles.length == 5);
+        assert(rootFiles.length == 6);
         assert(identity.file("file-1").read() == cast(ubyte[])"initial-data");
         assert(stats.refreshCalls == 1);
 

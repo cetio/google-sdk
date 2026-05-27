@@ -239,9 +239,11 @@ CellValue[][] parseCsv(string csv)
         }
     }
 
-    currentRow ~= parseCell(currentField);
-    if (currentRow.length > 0)
+    if (currentField.length > 0 || currentRow.length > 0)
+    {
+        currentRow ~= parseCell(currentField);
         ret ~= currentRow;
+    }
 
     return ret;
 }
