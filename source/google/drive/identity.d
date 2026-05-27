@@ -5,7 +5,7 @@ import google.drive.errors : GoogleDriveAuthError, GoogleDriveProtocolError;
 import google.drive.file : File;
 import google.drive.folder : Folder, folderMimeType;
 import google.drive.session : Session;
-import google.sheets : Sheet, SheetType, googleSheetText = text;
+import google.sheets : Table, TableType, googleSheetCsv = csv;
 import std.json : JSONType, JSONValue;
 import std.net.curl : HTTP;
 
