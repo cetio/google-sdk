@@ -1,32 +1,33 @@
-# google-sdk
+# Google-SDK
 
-google-sdk is a small D library for Google Drive with pragmatic Docs and Sheets text export helpers. The surface stays direct: authenticate, browse Drive, read or write files, and pull text from Google Docs or Google Sheets without wrapping the API in a large object graph.
+[![License](https://img.shields.io/badge/License-AGPL--3-blue)](LICENSE.txt)
 
-## Features
+Google-SDK is a small D library for Google Drive with pragmatic Docs and Sheets text export helpers. The surface stays direct: authenticate, browse Drive, read or write files, and pull text from Google Docs or Google Sheets without wrapping the API in a large object graph.
 
-- **Google Drive** - OAuth login, account identity, folder listing, file listing, metadata refresh, upload, download, save, and delete.
-- **Google Docs** - Lightweight text export for Drive files with the Google Docs MIME type.
-- **Google Sheets** - Lightweight CSV export for Drive files with the Google Sheets MIME type.
-- **Shared File Surface** - `google.drive.IFile` exposes common file metadata plus `read`, `write`, `save`, and `text`.
+## Modules
+
+| Module | Description |
+|--------|-------------|
+| `google.drive` | Drive-first API surface: `Session`, `Identity`, `Folder`, `File`, `IFile`, and Drive errors. |
+| `google.docs` | MIME helpers plus plain-text export for Google Docs files. |
+| `google.sheets` | MIME helpers plus CSV export for Google Sheets files. |
+| `google` | Convenience entrypoint that re-exports the packages above. |
 
 ## Installation
+
+`dub add google-sdk`
+
+For local development in this workspace:
 
 ```json
 {
     "dependencies": {
-        "google-sdk": "*"
+        "google-sdk": {
+            "path": "../google-sdk"
+        }
     }
 }
 ```
-
-For local development in this workspace, Galah points at `../google-sdk`.
-
-## Modules
-
-- `google.drive` - Drive-first API surface: `Session`, `Identity`, `Folder`, `File`, `IFile`, and Drive errors.
-- `google.docs` - MIME helpers plus plain-text export for Google Docs files.
-- `google.sheets` - MIME helpers plus CSV export for Google Sheets files.
-- `google` - Convenience entrypoint that re-exports the packages above.
 
 ## Usage
 
@@ -85,4 +86,4 @@ assert(google.sheets.supports("application/vnd.google-apps.spreadsheet"));
 
 ## License
 
-google-sdk is licensed under [AGPL-3.0](LICENSE.txt).
+Google-SDK is licensed under [AGPL-3.0](LICENSE.txt).
