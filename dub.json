@@ -38,8 +38,5 @@
 	},
 	"description": "Google Drive API with support for OAuth, accounts, and full file system with metadata.",
 	"license": "AGPL-3.0-only",
-	"name": "google-sdk",
-	"sourcePaths": [
-		"source"
-	]
+	"name": "google-sdk"
 }
