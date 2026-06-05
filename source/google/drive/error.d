@@ -1,4 +1,4 @@
-module google.drive.errors;
+module google.drive.error;
 
 import std.exception : basicExceptionCtors;
 
