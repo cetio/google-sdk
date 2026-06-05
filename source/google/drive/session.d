@@ -5,7 +5,7 @@ import conductor.oauth : OAuth, OAuthError, TokenBundle;
 import conductor.orchestrate : Orchestrator;
 import core.thread : Thread;
 import core.time : dur;
-import google.drive.errors;
+import google.drive.error;
 import google.drive.file : defaultFileMimeType, File;
 import google.drive.folder : folderMimeType;
 import google.drive.identity : Identity;
@@ -246,7 +246,6 @@ public:
         {
             Response response;
             if (useUploadEndpoint)
-            {
                 response = upload.send(
                     method,
                     path,
@@ -255,9 +254,7 @@ public:
                     contentType,
                     headers,
                 );
-            }
             else
-            {
                 response = api.send(
                     method,
                     path,
@@ -266,7 +263,6 @@ public:
                     contentType,
                     headers,
                 );
-            }
 
             if (response.status == 401 && identity.tryRefresh())
             {
