@@ -1,35 +1,21 @@
 # Google-SDK
 
-[![License](https://img.shields.io/badge/License-AGPL--3-blue)](LICENSE.txt)
+[![License](https://img.shields.io/badge/License-AGPL%20v3-blue)](LICENSE.txt)
 
-Google-SDK is a small D library for Google Drive with pragmatic Docs and Sheets text export helpers. The surface stays direct: authenticate, browse Drive, read or write files, and pull text from Google Docs or Google Sheets without wrapping the API in a large object graph.
+Google-SDK is a D library for Google Drive and Gmail. It manages OAuth sessions, file browsing, read/write operations, and Gmail messages and labels without requiring large wrapper layers.
 
-## Modules
+## Features
 
-| Module | Description |
-|--------|-------------|
-| `google.drive` | Drive-first API surface: `Session`, `Identity`, `Folder`, `File`, `IFile`, and Drive errors. |
-| `google.docs` | MIME helpers plus plain-text export for Google Docs files. |
-| `google.sheets` | MIME helpers plus CSV export for Google Sheets files. |
-| `google` | Convenience entrypoint that re-exports the packages above. |
+- **Drive**: Authenticate, browse folders and files, read bytes, write bytes, and export Google Workspace-native files.
+- **Gmail**: List, get, send, trash, and delete messages and threads. Manage labels and apply them to messages or threads.
+- **Docs And Sheets**: Detect MIME types and export Google Docs as plain text or Google Sheets as CSV. `File.text` dispatches automatically when the format is readable.
+- **Error Handling**: Typed exceptions for auth, permission, not-found, rate-limit, and protocol errors in both Drive and Gmail.
 
-## Installation
+## Usage
 
 `dub add google-sdk`
 
-For local development in this workspace:
-
-```json
-{
-    "dependencies": {
-        "google-sdk": {
-            "path": "../google-sdk"
-        }
-    }
-}
-```
-
-## Usage
+Create an OAuth client JSON from the Google Cloud Console and keep it handy.
 
 ### Connect To Drive
 
@@ -48,26 +34,55 @@ scope (exit) identity.logout();
 ### Browse Files
 
 ```d
-import google.drive;
-
 Folder[] folders = identity.folders();
 File[] files = identity.listFiles("root");
 ```
 
-### Read Bytes Or Text
+### Read Or Write
 
 ```d
-import google.drive;
-
 File file = identity.file("drive-file-id");
 
 ubyte[] bytes = file.read();
 string text = file.textReadable ? file.text : null;
+
+File newFile = new File(identity, "data.txt", "text/plain");
+newFile.write(cast(const(ubyte)[])"hello");
+```
+
+### Connect To Gmail
+
+```d
+import google.gmail;
+
+auto gmailSession = new google.gmail.Session("MyApp", oauth);
+auto gmailIdentity = gmailSession.login();
+scope (exit) gmailIdentity.logout();
+```
+
+### Manage Messages
+
+```d
+Message[] inbox = gmailIdentity.messages("label:inbox");
+Message msg = gmailIdentity.message(inbox[0].id);
+
+gmailIdentity.trash(msg);
+gmailIdentity.modifyLabels(msg, ["SPAM"], ["INBOX"]);
+```
+
+### Manage Labels
+
+```d
+Label[] allLabels = gmailIdentity.labels();
+
+Label label = new Label();
+label.name = "Project-A";
+gmailIdentity.create(label);
+
+gmailIdentity.remove(label);
 ```
 
 ### Docs And Sheets
-
-Google Docs and Google Sheets stay Drive files. The format-specific packages provide small helpers for MIME detection and text export, while `google.drive.File.text` dispatches to them automatically.
 
 ```d
 import google.docs;
@@ -77,7 +92,7 @@ assert(google.docs.supports("application/vnd.google-apps.document"));
 assert(google.sheets.supports("application/vnd.google-apps.spreadsheet"));
 ```
 
-## Current Limits
+## Scope
 
 - Docs support is export-only and currently targets plain text.
 - Sheets support is export-only and currently targets CSV.
