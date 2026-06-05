@@ -178,3 +178,88 @@ public:
             "application/json; charset=UTF-8",
         );
     }
+
+    JSONValue[] listThreads(
+        Identity identity,
+        string query = null,
+        string[] labelIds = null,
+        string maxResults = "100",
+    )
+    {
+        JSONValue[] ret;
+        string pageToken;
+
+        do
+        {
+            string[string] params;
+            params["maxResults"] = maxResults;
+            if (query != null)
+                params["q"] = query;
+            if (labelIds != null && labelIds.length)
+                params["labelIds"] = encodeComponent(labelIds.join(","));
+            if (pageToken != null)
+                params["pageToken"] = pageToken;
+
+            JSONValue json = requestJson(
+                identity,
+                HTTP.Method.get,
+                "/gmail/v1/users/me/threads",
+                params,
+            );
+
+            if ("threads" in json && json["threads"].type == JSONType.array)
+            {
+                foreach (JSONValue item; json["threads"].array)
+                    ret ~= item;
+            }
+
+            pageToken = "nextPageToken" in json ? json["nextPageToken"].str : null;
+        }
+        while (pageToken != null);
+
+        return ret;
+    }
+
+    JSONValue getThread(Identity identity, string id, string format = "full")
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.get,
+            "/gmail/v1/users/me/threads/"~encodeComponent(id),
+            ["format": format],
+        );
+    }
+
+    JSONValue trashThread(Identity identity, string id)
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/threads/"~encodeComponent(id)~"/trash",
+        );
+    }
+
+    JSONValue untrashThread(Identity identity, string id)
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/threads/"~encodeComponent(id)~"/untrash",
+        );
+    }
+
+    void deleteThread(Identity identity, string id)
+    {
+        execute(
+            identity,
+            HTTP.Method.del,
+            "/gmail/v1/users/me/threads/"~encodeComponent(id),
+        );
+    }
+
+    JSONValue modifyThread(
+        Identity identity,
+        string id,
+        string[] addLabelIds = null,
+        string[] removeLabelIds = null,
+    )
