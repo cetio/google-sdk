@@ -65,3 +65,116 @@ public:
         identity.tokens = TokenBundle.init;
     }
 
+    JSONValue[] listMessages(
+        Identity identity,
+        string query = null,
+        string[] labelIds = null,
+        string maxResults = "100",
+    )
+    {
+        JSONValue[] ret;
+        string pageToken;
+
+        do
+        {
+            string[string] params;
+            params["maxResults"] = maxResults;
+            if (query != null)
+                params["q"] = query;
+            if (labelIds != null && labelIds.length)
+                params["labelIds"] = encodeComponent(labelIds.join(","));
+            if (pageToken != null)
+                params["pageToken"] = pageToken;
+
+            JSONValue json = requestJson(
+                identity,
+                HTTP.Method.get,
+                "/gmail/v1/users/me/messages",
+                params,
+            );
+
+            if ("messages" in json && json["messages"].type == JSONType.array)
+            {
+                foreach (JSONValue item; json["messages"].array)
+                    ret ~= item;
+            }
+
+            pageToken = "nextPageToken" in json ? json["nextPageToken"].str : null;
+        }
+        while (pageToken != null);
+
+        return ret;
+    }
+
+    JSONValue getMessage(Identity identity, string id, string format = "full")
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.get,
+            "/gmail/v1/users/me/messages/"~encodeComponent(id),
+            ["format": format],
+        );
+    }
+
+    JSONValue sendMessage(Identity identity, string raw)
+    {
+        JSONValue payload = JSONValue.emptyObject;
+        payload["raw"] = JSONValue(raw);
+
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/messages/send",
+            null,
+            cast(const(ubyte)[])payload.toString().dup,
+            "application/json; charset=UTF-8",
+        );
+    }
+
+    JSONValue trashMessage(Identity identity, string id)
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/messages/"~encodeComponent(id)~"/trash",
+        );
+    }
+
+    JSONValue untrashMessage(Identity identity, string id)
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/messages/"~encodeComponent(id)~"/untrash",
+        );
+    }
+
+    void deleteMessage(Identity identity, string id)
+    {
+        execute(
+            identity,
+            HTTP.Method.del,
+            "/gmail/v1/users/me/messages/"~encodeComponent(id),
+        );
+    }
+
+    JSONValue modifyMessage(
+        Identity identity,
+        string id,
+        string[] addLabelIds = null,
+        string[] removeLabelIds = null,
+    )
+    {
+        JSONValue payload = JSONValue.emptyObject;
+        payload["addLabelIds"] = labelArray(addLabelIds);
+        payload["removeLabelIds"] = labelArray(removeLabelIds);
+
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/messages/"~encodeComponent(id)~"/modify",
+            null,
+            cast(const(ubyte)[])payload.toString().dup,
+            "application/json; charset=UTF-8",
+        );
+    }
