@@ -263,3 +263,78 @@ public:
         string[] addLabelIds = null,
         string[] removeLabelIds = null,
     )
+    {
+        JSONValue payload = JSONValue.emptyObject;
+        payload["addLabelIds"] = labelArray(addLabelIds);
+        payload["removeLabelIds"] = labelArray(removeLabelIds);
+
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/threads/"~encodeComponent(id)~"/modify",
+            null,
+            cast(const(ubyte)[])payload.toString().dup,
+            "application/json; charset=UTF-8",
+        );
+    }
+
+    JSONValue[] listLabels(Identity identity)
+    {
+        JSONValue[] ret;
+        JSONValue json = requestJson(
+            identity,
+            HTTP.Method.get,
+            "/gmail/v1/users/me/labels",
+        );
+
+        if ("labels" in json && json["labels"].type == JSONType.array)
+        {
+            foreach (JSONValue item; json["labels"].array)
+                ret ~= item;
+        }
+
+        return ret;
+    }
+
+    JSONValue getLabel(Identity identity, string id)
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.get,
+            "/gmail/v1/users/me/labels/"~encodeComponent(id),
+        );
+    }
+
+    JSONValue createLabel(Identity identity, Label label)
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.post,
+            "/gmail/v1/users/me/labels",
+            null,
+            cast(const(ubyte)[])label.toJson().toString().dup,
+            "application/json; charset=UTF-8",
+        );
+    }
+
+    JSONValue updateLabel(Identity identity, Label label)
+    {
+        return requestJson(
+            identity,
+            HTTP.Method.put,
+            "/gmail/v1/users/me/labels/"~encodeComponent(label.id),
+            null,
+            cast(const(ubyte)[])label.toJson().toString().dup,
+            "application/json; charset=UTF-8",
+        );
+    }
+
+    void deleteLabel(Identity identity, string id)
+    {
+        execute(
+            identity,
+            HTTP.Method.del,
+            "/gmail/v1/users/me/labels/"~encodeComponent(id),
+        );
+    }
+
