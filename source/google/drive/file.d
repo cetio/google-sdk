@@ -1,7 +1,7 @@
 module google.drive.file;
 
 import google.docs : googleDocExportMimeType = exportMimeType, googleDocText = text, isGoogleDoc = supports;
-import google.drive.errors : GoogleDriveNotFoundError, GoogleDriveProtocolError, GoogleDriveUnsupportedContentError;
+import google.drive.error : GoogleDriveNotFoundError, GoogleDriveProtocolError, GoogleDriveUnsupportedContentError;
 import google.drive.folder : folderMimeType;
 import google.drive.identity : Identity;
 import google.drive.ifile : IFile;
@@ -223,7 +223,6 @@ public:
         }
 
         try
-        {
             return identity.session.execute(
                 identity,
                 false,
@@ -231,7 +230,6 @@ public:
                 identity.session.filePath(id),
                 ["alt": "media"],
             ).content;
-        }
         catch (GoogleDriveNotFoundError)
         {
             clearRemote();
@@ -259,9 +257,7 @@ public:
             return;
         }
         catch (GoogleDriveNotFoundError)
-        {
             clearRemote();
-        }
 
         create();
         apply(identity.session.updateFileData(identity, this, data));
