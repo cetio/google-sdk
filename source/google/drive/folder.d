@@ -1,6 +1,6 @@
 module google.drive.folder;
 
-import google.drive.errors : GoogleDriveNotFoundError, GoogleDriveProtocolError;
+import google.drive.error : GoogleDriveNotFoundError, GoogleDriveProtocolError;
 import google.drive.file : File;
 import google.drive.identity : Identity;
 import std.json : JSONType, JSONValue;

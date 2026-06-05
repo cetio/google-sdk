@@ -1,7 +1,7 @@
 module google.drive.identity;
 
 import conductor.oauth : OAuthError, TokenBundle;
-import google.drive.errors : GoogleDriveAuthError, GoogleDriveProtocolError;
+import google.drive.error : GoogleDriveAuthError, GoogleDriveProtocolError;
 import google.drive.file : File;
 import google.drive.folder : Folder, folderMimeType;
 import google.drive.session : Session;
