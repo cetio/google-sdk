@@ -338,3 +338,120 @@ public:
         );
     }
 
+    JSONValue requestJson(
+        Identity identity,
+        HTTP.Method method,
+        string path,
+        string[string] query = null,
+        const(ubyte)[] content = null,
+        string contentType = null,
+    )
+    {
+        Response response = execute(
+            identity,
+            method,
+            path,
+            query,
+            content,
+            contentType,
+        );
+        return response.content == null ? JSONValue.init : parseJSON(cast(string)response.content);
+    }
+
+    Response execute(
+        Identity identity,
+        HTTP.Method method,
+        string path,
+        string[string] query = null,
+        const(ubyte)[] content = null,
+        string contentType = null,
+    )
+    {
+        ensureAuthorized(identity);
+
+        string[string] headers;
+        headers["Authorization"] = "Bearer "~identity.tokens.accessToken;
+        if (name != null)
+            headers["User-Agent"] = name;
+
+        foreach (int attempt; 0..5)
+        {
+            Response response = api.send(
+                method,
+                path,
+                query,
+                content,
+                contentType,
+                headers,
+            );
+
+            if (response.status == 401 && identity.tryRefresh())
+            {
+                headers["Authorization"] = "Bearer "~identity.tokens.accessToken;
+                continue;
+            }
+
+            if (response.status >= 200 && response.status < 300)
+                return response;
+
+            Exception err = cast(Exception)mapError(response);
+            if ((response.status == 429 || response.status >= 500) && attempt + 1 < 5)
+            {
+                Thread.sleep(dur!"msecs"(500 * (1 << attempt)));
+                continue;
+            }
+
+            throw err;
+        }
+
+        throw new GmailProtocolError("Gmail request failed before completion.");
+    }
+
+private:
+    Throwable mapError(Response response)
+    {
+        JSONValue json = response.content == null ? JSONValue.init : parseJSON(cast(string)response.content);
+        string message = "message" in json ? json["message"].str : null;
+        if (message == null && "error" in json && json["error"].type == JSONType.object)
+            message = "message" in json["error"] ? json["error"]["message"].str : null;
+
+        if (message == null)
+            message = "HTTP request failed with status "~response.status.to!string;
+
+        if (response.status == 401)
+            return new GmailAuthError(message);
+
+        if (response.status == 403)
+            return new GmailPermissionError(message);
+
+        if (response.status == 404)
+            return new GmailNotFoundError(message);
+
+        if (response.status == 429)
+            return new GmailRateLimitError(message);
+
+        return new GmailProtocolError(message);
+    }
+
+    void ensureAuthorized(Identity identity)
+    {
+        if (identity is null || identity.tokens.empty())
+            throw new GmailAuthError("No Gmail session is available. Call `login()` first.");
+
+        if (identity.tokens.expired() && !identity.tryRefresh())
+            throw new GmailAuthError("The Gmail session has expired and could not be refreshed.");
+    }
+
+    JSONValue labelArray(string[] labelIds)
+    {
+        JSONValue ret = JSONValue.emptyArray;
+
+        if (labelIds != null)
+        {
+            foreach (string labelId; labelIds)
+                ret.array ~= JSONValue(labelId);
+        }
+
+        return ret;
+    }
+}
