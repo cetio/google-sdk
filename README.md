@@ -2,6 +2,10 @@
 
 [![License](https://img.shields.io/badge/License-AGPL%20v3-blue)](LICENSE.txt)
 
+> [!WARNING]
+> 
+> Google-SDK is not a primary focus of mine, and, although I do maintain and occasionally expand upon the library, support may vary.
+
 Google-SDK is a D library for Google Drive and Gmail. It manages OAuth sessions, file browsing, read/write operations, and Gmail messages and labels without requiring large wrapper layers.
 
 ## Features
