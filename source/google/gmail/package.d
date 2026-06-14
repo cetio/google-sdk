@@ -2,7 +2,7 @@ module google.gmail;
 
 public:
 
-public import google.gmail.error;
+public import google.gmail.exception;
 public import google.gmail.identity;
 public import google.gmail.label;
 public import google.gmail.message;

@@ -5,7 +5,7 @@ import conductor.oauth : OAuth, OAuthError, TokenBundle;
 import conductor.orchestrate : Orchestrator;
 import core.thread : Thread;
 import core.time : dur;
-import google.gmail.error;
+import google.gmail.exception;
 import google.gmail.identity : Identity;
 import google.gmail.label : Label;
 import std.array : join;
@@ -30,7 +30,7 @@ public:
         string apiUrl = "https://gmail.googleapis.com",
     )
     {
-        this.name = name == null ? "GoogleSDK" : name;
+        this.name = name;
         this.oauth = oauth;
         this.api = Orchestrator(apiUrl);
     }
@@ -45,8 +45,8 @@ public:
                 requestedScope,
                 oauth.authorize(this.name, requestedScope)
             );
-        catch (OAuthError err)
-            throw new GmailAuthError(err.msg);
+        catch (OAuthError ex)
+            throw new GmailAuthException(ex.msg);
 
         ret.refresh();
         return ret;
@@ -59,8 +59,8 @@ public:
 
         try
             oauth.revoke(identity.tokens);
-        catch (OAuthError err)
-            throw new GmailAuthError(err.msg);
+        catch (OAuthError ex)
+            throw new GmailAuthException(ex.msg);
 
         identity.tokens = TokenBundle.init;
     }
@@ -394,21 +394,21 @@ public:
             if (response.status >= 200 && response.status < 300)
                 return response;
 
-            Exception err = cast(Exception)mapError(response);
+            Exception ex = cast(Exception)mapException(response);
             if ((response.status == 429 || response.status >= 500) && attempt + 1 < 5)
             {
                 Thread.sleep(dur!"msecs"(500 * (1 << attempt)));
                 continue;
             }
 
-            throw err;
+            throw ex;
         }
 
-        throw new GmailProtocolError("Gmail request failed before completion.");
+        throw new GmailProtocolException("Gmail request failed before completion.");
     }
 
 private:
-    Throwable mapError(Response response)
+    Throwable mapException(Response response)
     {
         JSONValue json = response.content == null ? JSONValue.init : parseJSON(cast(string)response.content);
         string message = "message" in json ? json["message"].str : null;
@@ -419,27 +419,27 @@ private:
             message = "HTTP request failed with status "~response.status.to!string;
 
         if (response.status == 401)
-            return new GmailAuthError(message);
+            return new GmailAuthException(message);
 
         if (response.status == 403)
-            return new GmailPermissionError(message);
+            return new GmailPermissionException(message);
 
         if (response.status == 404)
-            return new GmailNotFoundError(message);
+            return new GmailNotFoundException(message);
 
         if (response.status == 429)
-            return new GmailRateLimitError(message);
+            return new GmailRateLimitException(message);
 
-        return new GmailProtocolError(message);
+        return new GmailProtocolException(message);
     }
 
     void ensureAuthorized(Identity identity)
     {
         if (identity is null || identity.tokens.empty())
-            throw new GmailAuthError("No Gmail session is available. Call `login()` first.");
+            throw new GmailAuthException("No Gmail session is available. Call `login()` first.");
 
         if (identity.tokens.expired() && !identity.tryRefresh())
-            throw new GmailAuthError("The Gmail session has expired and could not be refreshed.");
+            throw new GmailAuthException("The Gmail session has expired and could not be refreshed.");
     }
 
     JSONValue labelArray(string[] labelIds)

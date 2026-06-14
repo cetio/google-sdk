@@ -1,6 +1,6 @@
 module google.drive.folder;
 
-import google.drive.error : GoogleDriveNotFoundError, GoogleDriveProtocolError;
+import google.drive.exception : DriveNotFoundException, DriveProtocolException;
 import google.drive.file : File;
 import google.drive.identity : Identity;
 import std.json : JSONType, JSONValue;
@@ -72,7 +72,7 @@ public:
             return;
 
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot create a Google Drive folder without an identity.");
+            throw new DriveProtocolException("Cannot create a Google Drive folder without an identity.");
 
         JSONValue created = identity.session.createMetadata(
             identity,
@@ -89,7 +89,7 @@ public:
             return null;
 
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot list Google Drive folders without an identity.");
+            throw new DriveProtocolException("Cannot list Google Drive folders without an identity.");
 
         return identity.listFolders(id);
     }
@@ -100,7 +100,7 @@ public:
             return null;
 
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot list Google Drive files without an identity.");
+            throw new DriveProtocolException("Cannot list Google Drive files without an identity.");
 
         return identity.listFiles(id);
     }
@@ -123,7 +123,7 @@ public:
     void refresh()
     {
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot refresh a Google Drive folder without an identity.");
+            throw new DriveProtocolException("Cannot refresh a Google Drive folder without an identity.");
 
         JSONValue value = identity.fetchMetadata(id);
         if (
@@ -132,7 +132,7 @@ public:
             value["mimeType"].type != JSONType.string ||
             value["mimeType"].str != folderMimeType
         )
-            throw new GoogleDriveNotFoundError("Google Drive folder no longer exists.");
+            throw new DriveNotFoundException("Google Drive folder no longer exists.");
 
         apply(value);
     }

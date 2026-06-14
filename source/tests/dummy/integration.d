@@ -4,9 +4,9 @@ version (GoogleSdkTestDummy)
 {
     import core.thread : Thread;
     import core.time : dur;
-    import google.drive : File, Folder, folderMimeType, GoogleDriveNotFoundError,
+    import google.drive : File, Folder, folderMimeType, DriveNotFoundException,
         Identity,
-        GoogleDrivePermissionError, GoogleDriveUnsupportedContentError, Session;
+        DrivePermissionException, DriveUnsupportedContentException, Session;
     import google.sheets : CellType, CellValue, Table, TableType, Row;
     import conductor.http : send;
     import conductor.oauth : OAuth, TokenCache;
@@ -478,7 +478,7 @@ version (GoogleSdkTestDummy)
         }
 
         Session session = new Session(
-            "GoogleDrive Dummy Tests",
+            "Drive Dummy Tests",
             makeDummyOAuth(server.baseUrl(), &stats, new TokenCache(cacheDirectory)),
             server.baseUrl(),
             server.baseUrl()~"/upload",
@@ -584,9 +584,9 @@ version (GoogleSdkTestDummy)
         assert(colSlice[0].str == "Alice");
         assert(colSlice[1].str == "Bob");
 
-        assertThrown!GoogleDriveUnsupportedContentError(identity.file("slide-1").read());
-        assertThrown!GoogleDriveNotFoundError(identity.file("missing"));
-        assertThrown!GoogleDrivePermissionError(identity.file("forbidden"));
+        assertThrown!DriveUnsupportedContentException(identity.file("slide-1").read());
+        assertThrown!DriveNotFoundException(identity.file("missing"));
+        assertThrown!DrivePermissionException(identity.file("forbidden"));
 
         identity.logout();
 

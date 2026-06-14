@@ -1,7 +1,7 @@
 module google.drive.file;
 
 import google.docs : googleDocExportMimeType = exportMimeType, googleDocText = text, isGoogleDoc = supports;
-import google.drive.error : GoogleDriveNotFoundError, GoogleDriveProtocolError, GoogleDriveUnsupportedContentError;
+import google.drive.exception : DriveNotFoundException, DriveProtocolException, DriveUnsupportedContentException;
 import google.drive.folder : folderMimeType;
 import google.drive.identity : Identity;
 import google.drive.ifile : IFile;
@@ -186,7 +186,7 @@ public:
             return;
 
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot create a Google Drive file without an identity.");
+            throw new DriveProtocolException("Cannot create a Google Drive file without an identity.");
 
         JSONValue created = identity.session.createMetadata(
             identity,
@@ -203,19 +203,19 @@ public:
             return null;
 
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot read a Google Drive file without an identity.");
+            throw new DriveProtocolException("Cannot read a Google Drive file without an identity.");
 
         if (workspaceNative)
         {
             string exportType = exportMimeType();
             if (exportType == null)
-                throw new GoogleDriveUnsupportedContentError(
+                throw new DriveUnsupportedContentException(
                     "Google Workspace-native files of type `"~mimeType~"` are not readable.",
                 );
 
             try
                 return identity.session.exportFile(identity, id, exportType).content;
-            catch (GoogleDriveNotFoundError)
+            catch (DriveNotFoundException)
             {
                 clearRemote();
                 return null;
@@ -230,7 +230,7 @@ public:
                 identity.session.filePath(id),
                 ["alt": "media"],
             ).content;
-        catch (GoogleDriveNotFoundError)
+        catch (DriveNotFoundException)
         {
             clearRemote();
             return null;
@@ -240,10 +240,10 @@ public:
     void write(const(ubyte)[] data)
     {
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot write a Google Drive file without an identity.");
+            throw new DriveProtocolException("Cannot write a Google Drive file without an identity.");
 
         if (workspaceNative)
-            throw new GoogleDriveUnsupportedContentError(
+            throw new DriveUnsupportedContentException(
                 "Google Workspace-native files of type `"~mimeType~"` are not writable.",
             );
 
@@ -256,7 +256,7 @@ public:
             apply(updated);
             return;
         }
-        catch (GoogleDriveNotFoundError)
+        catch (DriveNotFoundException)
             clearRemote();
 
         create();
@@ -267,7 +267,7 @@ public:
     {
         ubyte[] bytes = read();
         if (bytes == null)
-            throw new GoogleDriveNotFoundError("Google Drive file does not exist in the cloud.");
+            throw new DriveNotFoundException("Google Drive file does not exist in the cloud.");
 
         string resolvedPath = expandTilde(path);
         string parent = dirName(resolvedPath);
@@ -283,7 +283,7 @@ public:
             return null;
 
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot read Google Drive text without an identity.");
+            throw new DriveProtocolException("Cannot read Google Drive text without an identity.");
 
         if (googleDoc())
             return googleDocText(identity, id);
@@ -292,7 +292,7 @@ public:
             return googleSheetCsv(identity, id);
 
         if (!supportsTextMimeType(mimeType))
-            throw new GoogleDriveUnsupportedContentError(
+            throw new DriveUnsupportedContentException(
                 "Google Drive file type `"~resolvedMimeType()~"` is not readable as text.",
             );
 
@@ -306,7 +306,7 @@ public:
     void refresh()
     {
         if (identity is null)
-            throw new GoogleDriveProtocolError("Cannot refresh a Google Drive file without an identity.");
+            throw new DriveProtocolException("Cannot refresh a Google Drive file without an identity.");
 
         JSONValue value = identity.fetchMetadata(id);
         if (
@@ -315,7 +315,7 @@ public:
             value["mimeType"].type != JSONType.string ||
             value["mimeType"].str == folderMimeType
         )
-            throw new GoogleDriveNotFoundError("Google Drive file no longer exists.");
+            throw new DriveNotFoundException("Google Drive file no longer exists.");
 
         apply(value);
     }

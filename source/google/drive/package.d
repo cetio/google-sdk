@@ -2,7 +2,7 @@ module google.drive;
 
 public:
 
-public import google.drive.error;
+public import google.drive.exception;
 public import google.drive.file;
 public import google.drive.folder;
 public import google.drive.identity;

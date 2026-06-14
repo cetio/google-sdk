@@ -1,7 +1,7 @@
 module google.gmail.identity;
 
 import conductor.oauth : OAuthError, TokenBundle;
-import google.gmail.error : GmailAuthError, GmailNotFoundError, GmailProtocolError;
+import google.gmail.exception : GmailAuthException, GmailNotFoundException, GmailProtocolException;
 import google.gmail.label : Label;
 import google.gmail.message : Message;
 import google.gmail.session : Session;
@@ -45,7 +45,7 @@ public:
     {
         JSONValue value = session.getMessage(this, id);
         if (value.type == JSONType.null_)
-            throw new GmailNotFoundError("Gmail message does not exist.");
+            throw new GmailNotFoundException("Gmail message does not exist.");
 
         return Message.fromJson(value);
     }
@@ -88,7 +88,7 @@ public:
     Message modifyLabels(Message msg, string[] add = null, string[] remove = null)
     {
         if (msg is null || msg.id == null)
-            throw new GmailProtocolError("Cannot modify labels of a null or unsent message.");
+            throw new GmailProtocolException("Cannot modify labels of a null or unsent message.");
 
         JSONValue value = session.modifyMessage(this, msg.id, add, remove);
         msg.apply(value);
@@ -108,7 +108,7 @@ public:
     {
         JSONValue value = session.getThread(this, id);
         if (value.type == JSONType.null_)
-            throw new GmailNotFoundError("Gmail thread does not exist.");
+            throw new GmailNotFoundException("Gmail thread does not exist.");
 
         return Thread.fromJson(value);
     }
@@ -145,7 +145,7 @@ public:
     Thread modifyThreadLabels(Thread thread, string[] add = null, string[] remove = null)
     {
         if (thread is null || thread.id == null)
-            throw new GmailProtocolError("Cannot modify labels of a null or unsaved thread.");
+            throw new GmailProtocolException("Cannot modify labels of a null or unsaved thread.");
 
         JSONValue value = session.modifyThread(this, thread.id, add, remove);
         thread.apply(value);
@@ -165,7 +165,7 @@ public:
     {
         JSONValue value = session.getLabel(this, id);
         if (value.type == JSONType.null_)
-            throw new GmailNotFoundError("Gmail label does not exist.");
+            throw new GmailNotFoundException("Gmail label does not exist.");
 
         return Label.fromJson(value);
     }
@@ -173,7 +173,7 @@ public:
     Label create(Label label)
     {
         if (label is null)
-            throw new GmailProtocolError("Cannot create a null Gmail label.");
+            throw new GmailProtocolException("Cannot create a null Gmail label.");
 
         JSONValue value = session.createLabel(this, label);
         label.apply(value);
@@ -183,7 +183,7 @@ public:
     Label update(Label label)
     {
         if (label is null || label.id == null)
-            throw new GmailProtocolError("Cannot update a null or unsaved Gmail label.");
+            throw new GmailProtocolException("Cannot update a null or unsaved Gmail label.");
 
         JSONValue value = session.updateLabel(this, label);
         label.apply(value);
@@ -225,8 +225,8 @@ public:
 
         try
             tokens = session.oauth.refresh(tokens);
-        catch (OAuthError err)
-            throw new GmailAuthError(err.msg);
+        catch (OAuthError ex)
+            throw new GmailAuthException(ex.msg);
 
         return true;
     }
