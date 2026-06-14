@@ -34,9 +34,9 @@
 	],
 	"copyright": "Copyright © 2026, cet",
 	"dependencies": {
-		"conductor": "~>2.0.0"
+		"conductor": "~>2.1.0"
 	},
-	"description": "Google SDK with support for OAuth, accounts, and full file system with metadata.",
+	"description": "Google APIs (Drive, Docs, Sheets, Gmail, etc.) with OAuth, identity management, and more.",
 	"license": "AGPL-3.0-only",
 	"name": "google-sdk"
 }
