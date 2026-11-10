@@ -1,6 +1,6 @@
 # Google-SDK
 
-[![License](https://img.shields.io/badge/License-AGPL--3.0--only-blue)](LICENSE.txt)
+[![DUB](https://img.shields.io/badge/DUB-package-red)](https://code.dlang.org/packages/google-sdk) [![License](https://img.shields.io/badge/License-AGPL--3.0--only-blue)](LICENSE.txt) [![CI](https://github.com/cetio/google-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/cetio/google-sdk/actions/workflows/ci.yml)
 
 > [!WARNING]
 > 
@@ -100,13 +100,6 @@ assert(google.docs.supports("application/vnd.google-apps.document"));
 assert(google.sheets.supports("application/vnd.google-apps.spreadsheet"));
 ```
 
-## Modules
-
-- `google.drive` - OAuth sessions, folder and file browsing, byte read/write, and Google Workspace exports.
-- `google.gmail` - Messages, threads, and labels: list, get, send, trash, delete, and modify.
-- `google.docs` - Google Docs MIME detection and plain-text export.
-- `google.sheets` - Google Sheets MIME detection and CSV export into typed tables.
-
 ## Scope
 
 - Docs support is export-only and currently targets plain text.
@@ -116,7 +109,7 @@ assert(google.sheets.supports("application/vnd.google-apps.spreadsheet"));
 
 ## Development
 
-See [Contributing](CONTRIBUTING.md) for change guidelines and [Testing](TESTING.md) for build and test commands.
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [TESTING.md](TESTING.md).
 
 ## License
 
