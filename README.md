@@ -15,9 +15,13 @@ Google-SDK is a D library for Google Drive and Gmail. It manages OAuth sessions,
 - **Docs And Sheets**: Detect MIME types and export Google Docs as plain text or Google Sheets as CSV. `File.text` dispatches automatically when the format is readable.
 - **Error Handling**: Typed exceptions for auth, permission, not-found, rate-limit, and protocol errors in both Drive and Gmail.
 
-## Usage
+## Installation
 
-`dub add google-sdk`
+```sh
+dub add google-sdk
+```
+
+## Quick Start
 
 Create an OAuth client JSON from the Google Cloud Console and keep it handy.
 
@@ -96,12 +100,23 @@ assert(google.docs.supports("application/vnd.google-apps.document"));
 assert(google.sheets.supports("application/vnd.google-apps.spreadsheet"));
 ```
 
+## Modules
+
+- `google.drive` - OAuth sessions, folder and file browsing, byte read/write, and Google Workspace exports.
+- `google.gmail` - Messages, threads, and labels: list, get, send, trash, delete, and modify.
+- `google.docs` - Google Docs MIME detection and plain-text export.
+- `google.sheets` - Google Sheets MIME detection and CSV export into typed tables.
+
 ## Scope
 
 - Docs support is export-only and currently targets plain text.
 - Sheets support is export-only and currently targets CSV.
 - Other Google Workspace-native formats remain metadata-aware but not text-readable or writable.
 - This library does not try to provide full Docs or Sheets editing APIs yet.
+
+## Development
+
+See [Contributing](CONTRIBUTING.md) for change guidelines and [Testing](TESTING.md) for build and test commands.
 
 ## License
 
