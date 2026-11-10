@@ -15,3 +15,8 @@ google-sdk-test-*
 *.lst
 libgoogle-sdk*
 .env
+/account.json
+/oauth_client.json
+/bin/
+/site/
+/docs/api/
