@@ -1,6 +1,6 @@
 # Google-SDK
 
-[![License](https://img.shields.io/badge/License-AGPL%20v3-blue)](LICENSE.txt)
+[![License](https://img.shields.io/badge/License-AGPL--3.0--only-blue)](LICENSE.txt)
 
 > [!WARNING]
 > 
@@ -120,4 +120,4 @@ See [Contributing](CONTRIBUTING.md) for change guidelines and [Testing](TESTING.
 
 ## License
 
-Google-SDK is licensed under [AGPL-3.0](LICENSE.txt).
+Google-SDK is licensed under [AGPL-3.0-only](LICENSE.txt).
