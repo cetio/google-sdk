@@ -37,4 +37,9 @@ jobs:
       - name: Build library
         env:
           DUB_HOME: ${{ runner.temp }}/dub
-        run: dub build --compiler=ldc2 -c dummy-tests
+        run: dub build --compiler=ldc2 --config=library
+
+      - name: Build dummy-tests configuration
+        env:
+          DUB_HOME: ${{ runner.temp }}/dub
+        run: dub build --compiler=ldc2 --config=dummy-tests

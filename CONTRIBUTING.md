@@ -16,8 +16,8 @@ Read the relevant implementation and tests first. Match the style of neighboring
 Run the library build and dummy tests before submitting a change.
 
 ```sh
-dub build --compiler=ldc2 -c dummy-tests
-dub test --compiler=ldc2 -c dummy-tests
+dub build --compiler=ldc2 --config=library
+dub test --compiler=ldc2 --config=dummy-tests
 ```
 
 Add or update dummy tests for behavior changes. They run against a local loopback server and need no credentials. The dummy suite currently has a known local failure in the Drive fixture; see [Testing](TESTING.md) for that failure and for the live suite, which is destructive and requires a dedicated test account.

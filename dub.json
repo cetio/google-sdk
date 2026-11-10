@@ -4,6 +4,11 @@
 	],
 	"configurations": [
 		{
+			"name": "library",
+			"targetType": "library",
+			"targetPath": "bin"
+		},
+		{
 			"name": "dummy-tests",
 			"targetType": "library",
 			"versions": [
@@ -38,5 +43,7 @@
 	},
 	"description": "Google APIs (Drive, Docs, Sheets, Gmail, etc.) with OAuth, identity management, and more.",
 	"license": "AGPL-3.0-only",
-	"name": "google-sdk"
+	"name": "google-sdk",
+	"targetType": "library",
+	"targetPath": "bin"
 }

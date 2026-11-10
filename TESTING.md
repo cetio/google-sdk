@@ -9,7 +9,7 @@ Install DUB and a D compiler. The commands here use LDC (`ldc2`). DUB resolves t
 ## Library Build
 
 ```sh
-dub build --compiler=ldc2 -c dummy-tests
+dub build --compiler=ldc2 --config=library
 ```
 
 ## Dummy Tests
@@ -22,7 +22,7 @@ The `GoogleSdkTestDummy` version starts a local loopback HTTP server and exercis
 
 ## Known Failure
 
-The dummy suite currently fails locally: the Drive fixture throws `JSONValue is not an object` during `session.login()` (observed with LDC 1.42.0). The cause is not yet identified. CI runs the library build with `-c dummy-tests`; it does not execute the suite.
+The dummy suite currently fails locally: the Drive fixture throws `JSONValue is not an object` during `session.login()` (observed with LDC 1.42.0). The cause is not yet identified. CI builds both the library and `dummy-tests` configurations; it does not execute the suite.
 
 ## Live And Full Tests
 
